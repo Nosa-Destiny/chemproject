@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Gas Law | Gas Laws Explorer | IYAMU DESTINY | Houston Community College</title>
+    <meta name="description" content="Learn about the Combined Gas Law and its applications in chemistry.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        /* Soda Can Experiment Animation Styles */
+        .animation-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lab-setup {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+        }
+        
+        .hot-plate {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 20px;
+            background-color: #64748b;
+            border-radius: 4px;
+        }
+        
+        .soda-can {
+            position: absolute;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 120px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            transition: all 0.5s ease;
+            overflow: hidden;
+            z-index: 3;
+        }
+        
+        .soda-can::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 10px;
+            background-color: #94a3b8;
+            border-radius: 4px;
+        }
+        
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: rgba(99, 102, 241, 0.5);
+            transition: height 0.5s ease;
+        }
+        
+        .steam {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.5s ease;
+        }
+        
+        .steam-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+        
+        .ice-bowl {
+            position: absolute;
+            bottom: 90px;
+            right: 40px;
+            width: 100px;
+            height: 80px; /* Increased height */
+            background-color: rgba(226, 232, 240, 0.8); /* Added opacity */
+            border-radius: 50% 50% 0 0;
+            border: 3px solid #94a3b8;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .ice-water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(147, 197, 253, 0.5);
+        }
+        
+        .ice-cube {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+        }
+        
+        .tongs {
+            position: absolute;
+            width: 80px;
+            height: 10px;
+            background-color: #94a3b8;
+            border-radius: 4px;
+            transform-origin: left center;
+            display: none;
+            z-index: 5;
+        }
+        
+        .tongs::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: -5px;
+            width: 20px;
+            height: 20px;
+            background-color: #64748b;
+            clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background-color: #4338ca;
+        }
+        
+        .control-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .readings {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+        
+        .reading {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #334155;
+        }
+        
+        .reading-value {
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        .explanation {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #334155;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+        
+        .submerged {
+            z-index: 1;
+        }
+        /* Add this to your existing styles */
+.submerged {
+    z-index: 10; /* Higher than ice bowl */
+    border: 2px solid #4f46e5; /* Add a border to make it stand out */
+    box-shadow: 0 0 10px rgba(79, 70, 229, 0.7); /* Add a glow effect */
+    background-color: #e2e8f0; /* Keep original color even when submerged */
+}
+
+.ice-bowl {
+    z-index: 5; /* Lower than submerged can */
+}
+
+/* Make the ice bowl slightly transparent */
+.ice-water {
+    background-color: rgba(147, 197, 253, 0.3); /* More transparent */
+}
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas" width="1272" height="594"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        Gas Laws Explorer
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="pt-16">
+            <!-- Combined Gas Law Section -->
+            <section id="combined-gas-law" class="py-16 min-h-screen flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="p-8 lg:p-12">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                    Combined Gas Law
+                                </h2>
+                                <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                    <p class="text-lg md:text-xl font-mono text-indigo-900">P₁V₁/T₁ = P₂V₂/T₂</p>
+                                </div>
+                                <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                    The Combined Gas Law combines Boyle's Law, Charles's Law, and Gay-Lussac's Law into a single expression that relates pressure, volume, and temperature of a gas.
+                                </p>
+                                <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                                        <li class="text-slate-700">The Combined Gas Law allows you to calculate how changes in pressure, volume, and temperature affect a gas when the amount of gas remains constant.</li>
+                                        <li class="text-slate-700">It combines the three gas laws: Boyle's Law (pressure-volume relationship), Charles's Law (volume-temperature relationship), and Gay-Lussac's Law (pressure-temperature relationship).</li>
+                                        <li class="text-slate-700">This relationship is described by the equation P₁V₁/T₁ = P₂V₂/T₂, where P₁, V₁, and T₁ represent the initial pressure, volume, and temperature, and P₂, V₂, and T₂ represent the final pressure, volume, and temperature.</li>
+                                    </ul>
+                                </div>
+                                <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li class="text-slate-700">Weather forecasting and meteorology</li>
+                                        <li class="text-slate-700">Breathing and respiratory systems</li>
+                                        <li class="text-slate-700">Refrigeration cycles</li>
+                                        <li class="text-slate-700">Engine design and combustion systems</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="p-8 flex items-center">
+                                <div class="w-full animate-slideUp" style="animation-delay: 0.7s;">
+                                    <div class="animation-container" id="combined-gas-animation">
+                                        <div class="lab-setup">
+                                            <div class="hot-plate"></div>
+                                            <div class="soda-can" id="soda-can">
+                                                <div class="water" id="water"></div>
+                                                <div class="steam" id="steam"></div>
+                                            </div>
+                                            <div class="ice-bowl">
+                                                <div class="ice-water">
+                                                    <div class="ice-cube" style="top: 10px; left: 20px;"></div>
+                                                    <div class="ice-cube" style="top: 30px; left: 40px;"></div>
+                                                    <div class="ice-cube" style="top: 15px; left: 70px;"></div>
+                                                </div>
+                                            </div>
+                                            <div class="tongs" id="tongs"></div>
+                                        </div>
+                                        <div class="readings">
+                                            <div class="reading">Pressure: <span class="reading-value" id="pressure-value">1.0 atm</span></div>
+                                            <div class="reading">Volume: <span class="reading-value" id="volume-value">1.0 L</span></div>
+                                            <div class="reading">Temperature: <span class="reading-value" id="temp-value">25°C</span></div>
+                                        </div>
+                                        <div class="explanation" id="explanation">
+                                            <strong>What's happening:</strong>
+                                            <p id="explanation-text">Heating the can creates steam, increasing temperature and pressure.</p>
+                                        </div>
+                                        <div class="controls">
+                                            <button class="control-btn" id="btn-heat">Heat the Can</button>
+                                            <button class="control-btn" id="btn-flip" disabled>Flip into Ice Water</button>
+                                            <button class="control-btn" id="btn-reset">Reset Experiment</button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center text-slate-600">
+                                        <p>Interactive demonstration of the Crushed Soda Can experiment showing the Combined Gas Law</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+        
+        // Animate elements on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-slideUp, .animate-fadeIn');
+            animatedElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1 + 0.2}s`;
+            });
+            
+            // Initialize Combined Gas Law animation
+            initCombinedGasAnimation();
+        });
+        
+        // Resize handler for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Combined Gas Law Animation - Soda Can Experiment
+        function initCombinedGasAnimation() {
+            const sodaCan = document.getElementById('soda-can');
+            const water = document.getElementById('water');
+            const steam = document.getElementById('steam');
+            const tongs = document.getElementById('tongs');
+            const pressureValue = document.getElementById('pressure-value');
+            const volumeValue = document.getElementById('volume-value');
+            const tempValue = document.getElementById('temp-value');
+            const explanation = document.getElementById('explanation');
+            const explanationText = document.getElementById('explanation-text');
+            const btnHeat = document.getElementById('btn-heat');
+            const btnFlip = document.getElementById('btn-flip');
+            const btnReset = document.getElementById('btn-reset');
+            
+            // Initial state
+            let state = {
+                pressure: 1.0, // atm
+                volume: 1.0, // L (relative)
+                temperature: 25, // °C
+                isHeated: false,
+                isFlipped: false
+            };
+            
+            // Update readings display
+            function updateReadings() {
+                pressureValue.textContent = `${state.pressure.toFixed(1)} atm`;
+                volumeValue.textContent = `${state.volume.toFixed(1)} L`;
+                tempValue.textContent = `${state.temperature}°C`;
+            }
+            
+            // Create steam particles
+            function createSteamParticles() {
+                steam.innerHTML = '';
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'steam-particle';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    steam.appendChild(particle);
+                }
+            }
+            
+            // Heat the can
+            btnHeat.addEventListener('click', () => {
+                if (state.isHeated || state.isFlipped) return;
+                
+                state.isHeated = true;
+                btnHeat.disabled = true;
+                
+                // Animation sequence
+                // 1. Water starts boiling
+                water.style.height = '5px'; // Some water evaporates
+                
+                // 2. Steam appears
+                steam.style.height = '100px';
+                createSteamParticles();
+                
+                // 3. Temperature and pressure increase
+                let temp = 25;
+                let pressure = 1.0;
+                
+                const heatInterval = setInterval(() => {
+                    temp += 2;
+                    pressure += 0.1;
+                    
+                    state.temperature = temp;
+                    state.pressure = pressure;
+                    updateReadings();
+                    
+                    if (temp >= 120) {
+                        clearInterval(heatInterval);
+                        btnFlip.disabled = false;
+                        explanation.style.opacity = '1';
+                        explanationText.textContent = "Can is heated - steam has replaced most air inside. Ready to flip!";
+                    }
+                }, 100);
+            });
+            
+            // Flip the can into ice water
+            btnFlip.addEventListener('click', () => {
+                if (!state.isHeated || state.isFlipped) return;
+                
+                state.isFlipped = true;
+                btnFlip.disabled = true;
+                
+                // Show tongs
+                tongs.style.display = 'block';
+                tongs.style.left = '50%';
+                tongs.style.bottom = '150px';
+                tongs.style.transform = 'translateX(-50%) rotate(-30deg)';
+                
+                // Animation sequence
+                // 1. Pick up the can with tongs
+                setTimeout(() => {
+                    tongs.style.bottom = '180px';
+                    sodaCan.style.bottom = '180px';
+                    
+                    // 2. Move to ice water
+                    setTimeout(() => {
+                        tongs.style.left = '150px';
+                        tongs.style.bottom = '110px';
+                        sodaCan.style.left = '320px';
+                        sodaCan.style.bottom = '110px';
+                        
+                        // 3. Rotate and submerge in water
+                        setTimeout(() => {
+                            tongs.style.transform = 'translateX(-50%) rotate(90deg)';
+                            sodaCan.style.transform = 'translateX(-50%) rotate(180deg)';
+                            sodaCan.classList.add('submerged');
+                            
+                            // 4. Can gets submerged and then crushed
+                            setTimeout(() => {
+                                // Lower into water
+                                sodaCan.style.bottom = '99px';
+                                
+                                // Steam disappears (condenses)
+                                steam.style.height = '0';
+                                
+                                // Temperature and pressure drop rapidly
+                                let temp = 120;
+                                let pressure = 2.2;
+                                let volume = 1.0;
+                                
+                                const coolInterval = setInterval(() => {
+                                    temp -= 5;
+                                    pressure -= 0.2;
+                                    volume -= 0.05;
+                                    
+                                    if (volume <= 0.3) volume = 0.3;
+                                    
+                                    state.temperature = temp;
+                                    state.pressure = pressure;
+                                    state.volume = volume;
+                                    updateReadings();
+                                    
+                                    // Adjust can size
+                                    sodaCan.style.height = `${120 * volume}px`;
+                                    
+                                    if (temp <= 25) {
+                                        clearInterval(coolInterval);
+                                        explanationText.textContent = "Steam condenses in cold water, reducing pressure. Atmospheric pressure crushes the can!";
+                                        
+                                        // Hide tongs after crushing
+                                        setTimeout(() => {
+                                            tongs.style.display = 'none';
+                                        }, 500);
+                                    }
+                                }, 100);
+                                
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            });
+            
+            // Reset the experiment
+            btnReset.addEventListener('click', () => {
+                // Reset state
+                state = {
+                    pressure: 1.0,
+                    volume: 1.0,
+                    temperature: 25,
+                    isHeated: false,
+                    isFlipped: false
+                };
+                
+                // Reset visuals
+                sodaCan.style.height = '120px';
+                sodaCan.style.bottom = '110px';
+                sodaCan.style.left = '50%';
+                sodaCan.style.transform = 'translateX(-50%) rotate(0deg)';
+                sodaCan.classList.remove('submerged');
+                water.style.height = '10px';
+                steam.style.height = '0';
+                tongs.style.display = 'none';
+                
+                // Reset buttons
+                btnHeat.disabled = false;
+                btnFlip.disabled = true;
+                
+                // Reset readings
+                updateReadings();
+                
+                // Hide explanation
+                explanation.style.opacity = '0';
+            });
+            
+            // Initialize readings
+            updateReadings();
+        }
+    </script>
+    
+</body>
+</html>

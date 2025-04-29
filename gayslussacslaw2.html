@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gay-Lussac's Law | Gas Laws Explorer | IYAMU DESTINY</title>
+    <meta name="description" content="Learn about Gay-Lussac's Law and how gas pressure relates to temperature.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        .simulation-container {
+            background-color: #f0f4f8;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pressure-cooker {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .cooker-body {
+            width: 150px;
+            height: 120px;
+            background-color: #cbd5e1;
+            border-radius: 20px 20px 0 0;
+            position: absolute;
+            bottom: 40px;
+            left: 25px;
+            border: 3px solid #94a3b8;
+            transition: background-color 0.5s, box-shadow 0.5s;
+        }
+        
+        .cooker-lid {
+            width: 160px;
+            height: 20px;
+            background-color: #94a3b8;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 160px;
+            left: 20px;
+        }
+        
+        .cooker-handle {
+            width: 180px;
+            height: 10px;
+            background-color: #64748b;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 180px;
+            left: 10px;
+        }
+        
+        .cooker-base {
+            width: 180px;
+            height: 40px;
+            background-color: #e2e8f0;
+            border-radius: 0 0 10px 10px;
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            border: 3px solid #94a3b8;
+        }
+        
+        .pressure-valve {
+            width: 20px;
+            height: 20px;
+            background-color: #dc2626;
+            border-radius: 50%;
+            position: absolute;
+            top: 40px;
+            right: 30px;
+            transition: all 0.3s;
+            z-index: 15;
+        }
+        
+        .steam {
+            position: absolute;
+            width: 15px;
+            height: 40px;
+            background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
+            border-radius: 50% 50% 20% 20%;
+            opacity: 0;
+            filter: blur(6px);
+            z-index: 10;
+            transform-origin: bottom center;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0;
+            z-index: 5;
+            animation: bubble-rise linear forwards;
+        }
+        
+        @keyframes bubble-rise {
+            0% {
+                transform: translateY(0) scale(0.3);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .boiling-water {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .hot {
+            box-shadow: 0 0 15px rgba(255, 100, 100, 0.7);
+        }
+        
+        .gauge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid #334155;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #1e293b;
+            z-index: 20;
+        }
+        
+        .temperature-gauge {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .pressure-gauge {
+            top: 20px;
+            right: 20px;
+        }
+        
+        .needle {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background-color: #dc2626;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-45deg);
+            transition: transform 0.5s;
+        }
+        
+        .slider-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #cbd5e1;
+            outline: none;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .control-button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-button:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .simulation-status {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas" width="1272" height="594"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        Gas Laws Explorer
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="pt-16">
+            <section class="min-h-screen flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="p-8 lg:p-12">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                    Gay-Lussac's Law
+                                </h2>
+                                <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                    <p class="text-lg md:text-xl font-mono text-indigo-900">P₁/T₁ = P₂/T₂</p>
+                                </div>
+                                <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                    Gay-Lussac's Law states that the pressure of a gas is directly proportional to its absolute temperature when volume and amount are held constant.
+                                </p>
+                                <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                                        <li class="text-slate-700">As the temperature of a gas increases, its pressure increases proportionally.</li>
+                                        <li class="text-slate-700">As the temperature decreases, the pressure decreases proportionally.</li>
+                                        <li class="text-slate-700">The ratio of pressure to absolute temperature remains constant.</li>
+                                        <li class="text-slate-700">This relationship is described by the equation P₁/T₁ = P₂/T₂, where P₁ and T₁ represent the initial pressure and temperature, and P₂ and T₂ represent the final pressure and temperature.</li>
+                                    </ul>
+                                </div>
+                                <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li class="text-slate-700">Pressure cookers</li>
+                                        <li class="text-slate-700">Aerosol cans (warning about heating)</li>
+                                        <li class="text-slate-700">Automobile tire pressure changes with temperature</li>
+                                        <li class="text-slate-700">Industrial pressure vessels</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="p-8 flex items-center">
+                                <div class="w-full h-full animate-slideUp" style="animation-delay: 0.7s;">
+                                    <div class="simulation-container">
+                                        <h3 class="text-xl font-semibold mb-4 text-center text-indigo-700">Pressure Cooker Simulation</h3>
+                                        <div class="pressure-cooker">
+                                            <div class="cooker-body" id="cooker-body">
+                                                <div class="boiling-water" id="boiling-water"></div>
+                                                <div class="pressure-valve" id="pressure-valve"></div>
+                                            </div>
+                                            <div class="cooker-lid"></div>
+                                            <div class="cooker-handle"></div>
+                                            <div class="cooker-base"></div>
+                                            
+                                            <div class="gauge temperature-gauge">
+                                                <div>Temp</div>
+                                                <div class="needle" id="temp-needle"></div>
+                                                <div class="absolute bottom-1 text-xs" id="temp-value">25°C</div>
+                                            </div>
+                                            
+                                            <div class="gauge pressure-gauge">
+                                                <div>Press</div>
+                                                <div class="needle" id="pressure-needle"></div>
+                                                <div class="absolute bottom-1 text-xs" id="pressure-value">1.0 atm</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="slider-container">
+                                            <label for="temp-slider" class="block text-sm font-medium text-gray-700 mb-1">Temperature Control</label>
+                                            <input type="range" min="25" max="150" value="25" class="slider" id="temp-slider">
+                                            <div class="flex justify-between text-xs text-gray-600 mt-1">
+                                                <span>25°C</span>
+                                                <span>150°C</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="control-buttons">
+                                            <button class="control-button" id="play-button">Play</button>
+                                            <button class="control-button" id="pause-button">Pause</button>
+                                            <button class="control-button" id="reset-button">Reset</button>
+                                        </div>
+                                        
+                                        <div class="simulation-status" id="simulation-status">Ready</div>
+                                        
+                                        <div class="mt-4 text-sm text-gray-600">
+                                            <p class="font-medium">Simulation Explanation:</p>
+                                            <ol class="list-decimal pl-5 mt-2 space-y-1">
+                                                <li>Initial state: Pressure cooker at room temperature (25°C, 1 atm)</li>
+                                                <li>Click Play to automatically increase temperature</li>
+                                                <li>Watch water boil at 100°C and pressure increase</li>
+                                                <li>At 120°C, pressure reaches ~1.4 atm (normal cooking pressure)</li>
+                                                <li>Safety valve releases steam when pressure exceeds 1.3 atm</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+        
+        // Resize handler for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Pressure Cooker Simulation
+        const tempSlider = document.getElementById('temp-slider');
+        const tempNeedle = document.getElementById('temp-needle');
+        const pressureNeedle = document.getElementById('pressure-needle');
+        const tempValue = document.getElementById('temp-value');
+        const pressureValue = document.getElementById('pressure-value');
+        const pressureValve = document.getElementById('pressure-valve');
+        const cookerBody = document.getElementById('cooker-body');
+        const boilingWater = document.getElementById('boiling-water');
+        const playButton = document.getElementById('play-button');
+        const pauseButton = document.getElementById('pause-button');
+        const resetButton = document.getElementById('reset-button');
+        const statusDisplay = document.getElementById('simulation-status');
+        
+        let simulationInterval;
+        let isPlaying = false;
+        let currentTemp = 25;
+        let steamInterval;
+        let bubbleInterval;
+        
+        // Create dramatic steam effect
+        function createSteam() {
+            // Create multiple steam particles for a fuller effect
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const steam = document.createElement('div');
+                    steam.className = 'steam';
+                    
+                    // Random position near the valve
+                    const left = 130 + Math.random() * 20;
+                    steam.style.left = `${left}px`;
+                    steam.style.top = '120px';
+                    steam.style.width = `${10 + Math.random() * 10}px`;
+                    steam.style.height = `${30 + Math.random() * 30}px`;
+                    
+                    boilingWater.appendChild(steam);
+                    
+                    // Animate steam
+                    let opacity = 0.9;
+                    let height = parseFloat(steam.style.height);
+                    let pos = 120;
+                    let scale = 1;
+                    
+                    const animate = () => {
+                        opacity -= 0.008;
+                        height += 1.5;
+                        pos -= 2;
+                        scale += 0.02;
+                        
+                        steam.style.opacity = opacity;
+                        steam.style.height = `${height}px`;
+                        steam.style.top = `${pos}px`;
+                        steam.style.transform = `scale(${scale})`;
+                        
+                        if (opacity > 0) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            steam.remove();
+                        }
+                    };
+                    
+                    requestAnimationFrame(animate);
+                }, i * 100);
+            }
+        }
+        
+        // Create boiling bubbles
+        function createBubbles() {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            const size = 5 + Math.random() * 15;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            // Random position at bottom of cooker
+            const left = 30 + Math.random() * 90;
+            bubble.style.left = `${left}px`;
+            bubble.style.bottom = '0';
+            
+            // Random animation duration
+            const duration = 1 + Math.random() * 2;
+            bubble.style.animationDuration = `${duration}s`;
+            
+            boilingWater.appendChild(bubble);
+            
+            // Remove bubble after animation
+            setTimeout(() => {
+                bubble.remove();
+            }, duration * 1000);
+        }
+        
+        // Continuous effects when pressure is high or water is boiling
+        function startEffects(temp) {
+            if (temp > 100) {
+                if (!bubbleInterval) {
+                    bubbleInterval = setInterval(createBubbles, 200);
+                }
+                
+                if (temp > 120 && !steamInterval) {
+                    steamInterval = setInterval(createSteam, 300);
+                }
+            }
+        }
+        
+        function stopEffects() {
+            clearInterval(steamInterval);
+            clearInterval(bubbleInterval);
+            steamInterval = null;
+            bubbleInterval = null;
+        }
+        
+        // Update simulation based on temperature
+        function updateSimulation(temp) {
+            currentTemp = temp;
+            const tempK = temp + 273.15; // Convert to Kelvin
+            
+            // Calculate pressure using Gay-Lussac's Law (P1/T1 = P2/T2)
+            // Initial conditions: 25°C (298.15K) and 1 atm
+            const initialTempK = 25 + 273.15;
+            const initialPressure = 1.0;
+            const pressure = (initialPressure * tempK) / initialTempK;
+            
+            // Update temperature display
+            tempValue.textContent = `${temp}°C`;
+            tempSlider.value = temp;
+            
+            // Update pressure display (limit to 2 decimal places)
+            const displayPressure = Math.min(pressure, 1.5).toFixed(1);
+            pressureValue.textContent = `${displayPressure} atm`;
+            
+            // Update needle positions
+            // Temperature needle: -45deg (25°C) to 45deg (150°C)
+            const tempAngle = -45 + (temp - 25) * (90 / 125);
+            tempNeedle.style.transform = `translateX(-50%) rotate(${tempAngle}deg)`;
+            
+            // Pressure needle: -45deg (1 atm) to 45deg (1.5 atm)
+            const pressureAngle = -45 + (pressure - 1) * (90 / 0.5);
+            pressureNeedle.style.transform = `translateX(-50%) rotate(${Math.min(pressureAngle, 45)}deg)`;
+            
+            // Change cooker body color based on temperature (gets redder as hotter)
+            const red = Math.min(100 + (temp - 25) * 2, 255);
+            const greenBlue = Math.max(200 - (temp - 25) * 2, 100);
+            cookerBody.style.backgroundColor = `rgb(${red}, ${greenBlue}, ${greenBlue})`;
+            
+            // Add glow effect when very hot
+            if (temp > 100) {
+                cookerBody.classList.add('hot');
+                startEffects(temp);
+            } else {
+                cookerBody.classList.remove('hot');
+                stopEffects();
+            }
+            
+            // Show steam if pressure is high or water is boiling
+            if (pressure > 1.3 || temp >= 100) {
+                pressureValve.style.backgroundColor = '#ef4444';
+            } else {
+                pressureValve.style.backgroundColor = '#dc2626';
+            }
+            
+            // Extra steam when pressure is very high
+            if (pressure > 1.5) {
+                createSteam();
+            }
+        }
+        
+        // Play/pause/reset functionality
+        playButton.addEventListener('click', function() {
+            if (!isPlaying) {
+                isPlaying = true;
+                statusDisplay.textContent = "Heating up...";
+                
+                simulationInterval = setInterval(() => {
+                    currentTemp += 1;
+                    if (currentTemp >= 150) {
+                        currentTemp = 150;
+                        clearInterval(simulationInterval);
+                        isPlaying = false;
+                        statusDisplay.textContent = "Maximum temperature reached";
+                    }
+                    updateSimulation(currentTemp);
+                    
+                    // Extra steam at boiling point
+                    if (currentTemp === 100) {
+                        for (let i = 0; i < 10; i++) {
+                            setTimeout(createSteam, i * 100);
+                        }
+                    }
+                }, 200);
+            }
+        });
+        
+        pauseButton.addEventListener('click', function() {
+            if (isPlaying) {
+                clearInterval(simulationInterval);
+                isPlaying = false;
+                statusDisplay.textContent = "Paused";
+            }
+        });
+        
+        resetButton.addEventListener('click', function() {
+            clearInterval(simulationInterval);
+            stopEffects();
+            isPlaying = false;
+            currentTemp = 25;
+            updateSimulation(currentTemp);
+            statusDisplay.textContent = "Reset to initial state";
+            
+            // Remove any remaining effects
+            document.querySelectorAll('.steam, .bubble').forEach(el => el.remove());
+            cookerBody.classList.remove('hot');
+        });
+        
+        // Manual slider control
+        tempSlider.addEventListener('input', function() {
+            if (isPlaying) {
+                clearInterval(simulationInterval);
+                isPlaying = false;
+                statusDisplay.textContent = "Manual control";
+            }
+            currentTemp = parseInt(this.value);
+            updateSimulation(currentTemp);
+        });
+        
+        // Initialize simulation
+        updateSimulation(currentTemp);
+    </script>
+</body>
+</html>

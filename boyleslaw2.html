@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boyle's Law | Gas Laws Explorer</title>
+    <meta name="description" content="Learn about Boyle's Law and its applications in chemistry.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        /* CAD video player styling */
+        .cad-player {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cad-screen {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cad-animation {
+            width: 90%;
+            height: 80%;
+            background: #0f172a;
+            border: 2px solid #475569;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .piston {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 40px;
+            background: #64748b;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .piston-rod {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 100px;
+            background: #94a3b8;
+        }
+        
+        .cylinder {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 180px;
+            border: 2px solid #64748b;
+            border-bottom: none;
+            background: rgba(100, 116, 139, 0.1);
+        }
+        
+        .gas-particles {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 146px;
+            height: 140px;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #60a5fa;
+            border-radius: 50%;
+        }
+        
+        .cad-controls {
+            background: #1e293b;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .cad-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e2e8f0;
+        }
+        
+        .cad-btn:hover {
+            background: #475569;
+        }
+        
+        .cad-btn.play {
+            background: #3b82f6;
+        }
+        
+        .cad-btn.play:hover {
+            background: #2563eb;
+        }
+        
+        .pressure-display, .volume-display {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #60a5fa;
+            font-size: 14px;
+            border: 1px solid #334155;
+        }
+        
+        .cad-label {
+            position: absolute;
+            color: #e2e8f0;
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        Gas Laws Explorer
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <section class="py-16 min-h-screen flex items-center">
+            <div class="container mx-auto px-4 pt-16">
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8 lg:p-12">
+                            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                Boyle's Law
+                            </h2>
+                            <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                <p class="text-lg md:text-xl font-mono text-indigo-900">P₁V₁ = P₂V₂</p>
+                            </div>
+                            <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                Boyle's Law states that the pressure of a gas is inversely proportional to its volume when temperature and amount are held constant.
+                            </p>
+                            <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                <ul class="list-disc pl-5 space-y-2 mb-6">
+                                    <li class="text-slate-700">As the pressure on a gas increases, the volume of the gas decreases proportionally.</li>
+                                    <li class="text-slate-700">When the volume increases, the pressure decreases proportionally.</li>
+                                    <li class="text-slate-700">The product of pressure and volume remains constant.</li>
+                                    <li class="text-slate-700">This relationship is described by the equation P₁V₁ = P₂V₂, where P₁ and V₁ represent the initial pressure and volume, and P₂ and V₂ represent the final pressure and volume.</li>
+                                </ul>
+                            </div>
+                            <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li class="text-slate-700">Syringes and medical equipment</li>
+                                    <li class="text-slate-700">SCUBA diving and breathing apparatus</li>
+                                    <li class="text-slate-700">Aerosol spray cans</li>
+                                    <li class="text-slate-700">Car engines and pneumatic systems</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="p-8 flex items-center">
+                            <div class="w-full animate-slideUp" style="animation-delay: 0.7s;">
+                                <div class="cad-player">
+                                    <div class="cad-screen">
+                                        <div class="cad-animation" id="cadAnimation">
+                                            <div class="cylinder"></div>
+                                            <div class="piston-rod"></div>
+                                            <div class="piston"></div>
+                                            <div class="gas-particles" id="gasParticles"></div>
+                                            <div class="cad-label" style="top: 10px; left: 10px;">Boyle's Law Demonstration</div>
+                                            <div class="cad-label" style="top: 10px; right: 10px;">Piston-Cylinder System</div>
+                                            <div class="pressure-display" style="position: absolute; bottom: 60px; left: 10px;">Pressure: 1.0 atm</div>
+                                            <div class="volume-display" style="position: absolute; bottom: 30px; left: 10px;">Volume: 1.0 L</div>
+                                        </div>
+                                    </div>
+                                    <div class="cad-controls">
+                                        <div class="cad-btn play" id="playBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                            </svg>
+                                        </div>
+                                        <div class="cad-btn" id="resetBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw">
+                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                                <path d="M3 3v5h5"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="cad-btn" id="infoBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M12 16v-4"></path>
+                                                <path d="M12 8h.01"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-sm text-slate-600">
+                                    <p>This CAD simulation demonstrates Boyle's Law in action. Watch as the piston compresses the gas, increasing pressure while decreasing volume.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+
+        // Animate elements on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-slideUp, .animate-fadeIn');
+            animatedElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1 + 0.2}s`;
+            });
+            
+            // Initialize CAD animation
+            initBoyleLawAnimation();
+        });
+        
+        // Boyle's Law CAD Animation
+        function initBoyleLawAnimation() {
+            const cadAnimation = document.getElementById('cadAnimation');
+            const gasParticles = document.getElementById('gasParticles');
+            const playBtn = document.getElementById('playBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const infoBtn = document.getElementById('infoBtn');
+            const piston = document.querySelector('.piston');
+            const pistonRod = document.querySelector('.piston-rod');
+            const pressureDisplay = document.querySelector('.pressure-display');
+            const volumeDisplay = document.querySelector('.volume-display');
+            
+            let isPlaying = false;
+            let animationId;
+            let pistonHeight = 140; // Initial height of gas space
+            let pressure = 1.0;
+            let volume = 1.0;
+            
+            // Create gas particles
+            function createParticles() {
+                gasParticles.innerHTML = '';
+                const particleCount = Math.floor(volume * 20); // More particles for larger volume
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random position within current volume
+                    const left = Math.random() * 100;
+                    const bottom = Math.random() * pistonHeight;
+                    
+                    particle.style.left = `${left}%`;
+                    particle.style.bottom = `${bottom}px`;
+                    
+                    // Random animation for movement
+                    const duration = 2 + Math.random() * 3;
+                    const delay = Math.random() * 5;
+                    
+                    particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
+                    
+                    gasParticles.appendChild(particle);
+                }
+            }
+            
+            // Add CSS for particle animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% { transform: translate(0, 0); }
+                    25% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 10 - 5}px); }
+                    50% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 10 - 5}px); }
+                    75% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 10 - 5}px); }
+                    100% { transform: translate(0, 0); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Initial particles
+            createParticles();
+            
+            // Animation function
+            function animatePiston() {
+                if (pistonHeight <= 40) {
+                    // Reached maximum compression
+                    cancelAnimationFrame(animationId);
+                    isPlaying = false;
+                    playBtn.classList.remove('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    `;
+                    return;
+                }
+                
+                // Decrease volume (piston moves down)
+                pistonHeight -= 0.5;
+                volume = (pistonHeight / 140).toFixed(2);
+                pressure = (1 / volume).toFixed(2);
+                
+                // Update positions
+                piston.style.bottom = `${pistonHeight}px`;
+                pistonRod.style.height = `${pistonHeight + 40}px`;
+                gasParticles.style.height = `${pistonHeight}px`;
+                
+                // Update displays
+                pressureDisplay.textContent = `Pressure: ${pressure} atm`;
+                volumeDisplay.textContent = `Volume: ${volume} L`;
+                
+                // Recreate particles with new density
+                if (Math.random() > 0.9) createParticles();
+                
+                animationId = requestAnimationFrame(animatePiston);
+            }
+            
+            // Play/pause button
+            playBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    // Pause
+                    cancelAnimationFrame(animationId);
+                    isPlaying = false;
+                    playBtn.classList.remove('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    `;
+                } else {
+                    // Play
+                    isPlaying = true;
+                    playBtn.classList.add('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause">
+                            <rect width="4" height="16" x="6" y="4"></rect>
+                            <rect width="4" height="16" x="14" y="4"></rect>
+                        </svg>
+                    `;
+                    animatePiston();
+                }
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                cancelAnimationFrame(animationId);
+                isPlaying = false;
+                playBtn.classList.remove('play');
+                playBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                `;
+                
+                // Reset values
+                pistonHeight = 140;
+                volume = 1.0;
+                pressure = 1.0;
+                
+                // Reset positions
+                piston.style.bottom = `${pistonHeight}px`;
+                pistonRod.style.height = `${pistonHeight + 40}px`;
+                gasParticles.style.height = `${pistonHeight}px`;
+                
+                // Update displays
+                pressureDisplay.textContent = `Pressure: ${pressure} atm`;
+                volumeDisplay.textContent = `Volume: ${volume} L`;
+                
+                // Reset particles
+                createParticles();
+            });
+            
+            // Info button
+            infoBtn.addEventListener('click', () => {
+                alert("This simulation demonstrates Boyle's Law:\n\nAs the piston compresses the gas (decreasing volume), the pressure increases proportionally.\n\nNotice how P × V remains constant throughout the process.");
+            });
+        }
+    </script>
+</body>
+</html>

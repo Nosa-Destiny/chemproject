@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charles's Law | Gas Laws Explorer | IYAMU DESTINY</title>
+    <meta name="description" content="Learn about Charles's Law and how gas volume relates to temperature.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        /* Hot Air Balloon styling */
+        .balloon-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 120px;
+            height: 150px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.5s ease;
+        }
+        
+        .balloon-body {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #FF5252, #FF1744);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .balloon-stripe {
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+        
+        .balloon-basket {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background: #5D4037;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .balloon-ropes {
+            position: absolute;
+            width: 100%;
+            height: 25px;
+            bottom: -25px;
+            left: 0;
+        }
+        
+        .rope {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background: #5D4037;
+            bottom: 0;
+        }
+        
+        .flame {
+            position: absolute;
+            width: 15px;
+            height: 30px;
+            background: linear-gradient(to top, #FFC107, #FF9800);
+            bottom: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50% 50% 20% 20%;
+            opacity: 0.8;
+            filter: blur(1px);
+            animation: flicker 0.5s infinite alternate;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #FFEB3B;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .temperature-control {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 60px;
+            height: 200px;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .temp-indicator {
+            width: 40px;
+            height: 160px;
+            background: linear-gradient(to bottom, #3b82f6, #ef4444);
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .temp-pointer {
+            position: absolute;
+            left: -10px;
+            width: 60px;
+            height: 2px;
+            background: #e2e8f0;
+        }
+        
+        .cad-controls {
+            background: #1e293b;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .cad-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e2e8f0;
+        }
+        
+        .cad-btn:hover {
+            background: #475569;
+        }
+        
+        .cad-btn.play {
+            background: #3b82f6;
+        }
+        
+        .cad-btn.play:hover {
+            background: #2563eb;
+        }
+        
+        .volume-display, .temp-display {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #60a5fa;
+            font-size: 14px;
+            border: 1px solid #334155;
+            position: absolute;
+            left: 20px;
+        }
+        
+        .volume-display {
+            top: 20px;
+        }
+        
+        .temp-display {
+            top: 60px;
+        }
+        
+        .cad-label {
+            position: absolute;
+            color: #e2e8f0;
+            font-family: monospace;
+            font-size: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { transform: translateX(-50%) scaleY(1); opacity: 0.8; }
+            50% { transform: translateX(-50%) scaleY(1.1); opacity: 1; }
+        }
+        
+        @keyframes particleMove {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+        }
+        
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to bottom, #8BC34A, #689F38);
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas" width="1272" height="594"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        Gas Laws Explorer
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="pt-16">
+            <!-- Charles's Law Section -->
+            <section class="min-h-screen flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="p-8 lg:p-12">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                    Charles's Law
+                                </h2>
+                                <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                    <p class="text-lg md:text-xl font-mono text-indigo-900">V₁/T₁ = V₂/T₂</p>
+                                </div>
+                                <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                    Charles's Law states that the volume of a gas is directly proportional to its absolute temperature when pressure and amount are held constant.
+                                </p>
+                                <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                                        <li class="text-slate-700">As the temperature of a gas increases, its volume increases proportionally.</li>
+                                        <li class="text-slate-700">As the temperature decreases, the volume decreases proportionally.</li>
+                                        <li class="text-slate-700">The ratio of volume to absolute temperature remains constant.</li>
+                                        <li class="text-slate-700">Hot air balloons use this principle - heating the air inside makes it expand and become less dense than the surrounding air, creating lift.</li>
+                                    </ul>
+                                </div>
+                                <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li class="text-slate-700">Hot air balloons (shown in simulation)</li>
+                                        <li class="text-slate-700">Weather balloons</li>
+                                        <li class="text-slate-700">Thermometers</li>
+                                        <li class="text-slate-700">Refrigeration and air conditioning systems</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="p-8 flex items-center">
+                                <div class="w-full animate-slideUp" style="animation-delay: 0.7s;">
+                                    <div class="balloon-container">
+                                        <div class="balloon" id="balloon">
+                                            <div class="balloon-body">
+                                                <div class="balloon-stripe" style="top: 20%;"></div>
+                                                <div class="balloon-stripe" style="top: 40%;"></div>
+                                                <div class="balloon-stripe" style="top: 60%;"></div>
+                                                <div class="balloon-stripe" style="top: 80%;"></div>
+                                            </div>
+                                            <div class="balloon-ropes">
+                                                <div class="rope" style="left: 25%;"></div>
+                                                <div class="rope" style="left: 50%;"></div>
+                                                <div class="rope" style="left: 75%;"></div>
+                                            </div>
+                                            <div class="balloon-basket"></div>
+                                            <div class="flame" id="flame"></div>
+                                        </div>
+                                        <div class="temperature-control">
+                                            <div class="temp-indicator" id="tempIndicator">
+                                                <div class="temp-pointer" id="tempPointer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="volume-display">Volume: 1.0 m³</div>
+                                        <div class="temp-display">Temperature: 300 K</div>
+                                        <div class="ground"></div>
+                                    </div>
+                                    <div class="cad-controls">
+                                        <div class="cad-btn play" id="playBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                            </svg>
+                                        </div>
+                                        <div class="cad-btn" id="resetBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw">
+                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                                <path d="M3 3v5h5"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="cad-btn" id="infoBtn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M12 16v-4"></path>
+                                                <path d="M12 8h.01"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-sm text-slate-600">
+                                        <p>This simulation demonstrates Charles's Law using a hot air balloon. As the air inside is heated, it expands (increasing volume) and becomes less dense than the surrounding air, causing the balloon to rise.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+        
+        // Resize handler for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Animate elements on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-slideUp, .animate-fadeIn');
+            animatedElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1 + 0.2}s`;
+            });
+            
+            // Initialize Balloon animation
+            initBalloonAnimation();
+        });
+        
+        // Hot Air Balloon Animation for Charles's Law
+        function initBalloonAnimation() {
+            const balloon = document.getElementById('balloon');
+            const playBtn = document.getElementById('playBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const infoBtn = document.getElementById('infoBtn');
+            const tempPointer = document.getElementById('tempPointer');
+            const tempIndicator = document.getElementById('tempIndicator');
+            const flame = document.getElementById('flame');
+            const volumeDisplay = document.querySelector('.volume-display');
+            const tempDisplay = document.querySelector('.temp-display');
+            
+            let isPlaying = false;
+            let animationId;
+            let temperature = 300; // Initial temperature in Kelvin (27°C)
+            let volume = 1.0;
+            let balloonSize = 1.0;
+            let balloonHeight = 100;
+            
+            // Create heat particles
+            function createHeatParticles() {
+                // Remove old particles
+                const oldParticles = document.querySelectorAll('.heat-particle');
+                oldParticles.forEach(p => p.remove());
+                
+                // Create new particles based on temperature
+                const particleCount = Math.min(10 + Math.floor((temperature - 300) / 5), 30);
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle heat-particle';
+                    
+                    // Position near flame
+                    const left = 50 + (Math.random() * 20 - 10);
+                    const bottom = -55 - Math.random() * 20;
+                    
+                    particle.style.left = `${left}%`;
+                    particle.style.bottom = `${bottom}px`;
+                    
+                    // Movement based on temperature
+                    const speed = 0.5 + (temperature / 300) * 2;
+                    const angle = -Math.PI/2 + (Math.random() * Math.PI/4 - Math.PI/8);
+                    const tx = Math.cos(angle) * speed * 50;
+                    const ty = Math.sin(angle) * speed * 100;
+                    
+                    particle.style.setProperty('--tx', `${tx}px`);
+                    particle.style.setProperty('--ty', `${ty}px`);
+                    particle.style.animation = `particleMove ${2/speed}s linear forwards`;
+                    particle.style.opacity = '0.7';
+                    particle.style.background = `hsl(${20 + (temperature - 300) / 2}, 100%, 50%)`;
+                    
+                    flame.parentNode.appendChild(particle);
+                    
+                    // Remove particle after animation completes
+                    particle.addEventListener('animationend', () => {
+                        particle.remove();
+                    });
+                }
+            }
+            
+            // Update temperature pointer (now goes from cold at bottom to hot at top)
+            function updateTempPointer() {
+                const tempRange = 150; // From 300K to 450K (27°C to 177°C)
+                const tempPosition = ((temperature - 300) / tempRange) * 160;
+                tempPointer.style.bottom = `${160 - tempPosition}px`;
+                tempDisplay.textContent = `Temperature: ${temperature} K`;
+            }
+            
+            // Update balloon appearance
+            function updateBalloon() {
+                balloonSize = 0.8 + (temperature / 300) * 0.4;
+                balloonHeight = 100 + (temperature - 300) * 0.5;
+                
+                balloon.style.width = `${120 * balloonSize}px`;
+                balloon.style.height = `${150 * balloonSize}px`;
+                balloon.style.bottom = `${balloonHeight}px`;
+                
+                volume = balloonSize * balloonSize * balloonSize; // Approximate volume change
+                volumeDisplay.textContent = `Volume: ${volume.toFixed(2)} m³`;
+                
+                // Adjust flame intensity
+                flame.style.height = `${30 + (temperature - 300) / 5}px`;
+                flame.style.width = `${15 + (temperature - 300) / 10}px`;
+                flame.style.opacity = `${0.7 + (temperature - 300) / 300}`;
+            }
+            
+            // Animation function
+            function animateBalloon() {
+                if (temperature >= 450) {
+                    // Reached maximum temperature
+                    cancelAnimationFrame(animationId);
+                    isPlaying = false;
+                    playBtn.classList.remove('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    `;
+                    return;
+                }
+                
+                // Increase temperature (balloon expands and rises)
+                temperature += 1;
+                
+                // Update displays and appearance
+                updateTempPointer();
+                updateBalloon();
+                
+                // Create heat particles
+                if (temperature % 5 === 0) createHeatParticles();
+                
+                animationId = requestAnimationFrame(animateBalloon);
+            }
+            
+            // Play/pause button
+            playBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    // Pause
+                    cancelAnimationFrame(animationId);
+                    isPlaying = false;
+                    playBtn.classList.remove('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    `;
+                } else {
+                    // Play
+                    isPlaying = true;
+                    playBtn.classList.add('play');
+                    playBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause">
+                            <rect width="4" height="16" x="6" y="4"></rect>
+                            <rect width="4" height="16" x="14" y="4"></rect>
+                        </svg>
+                    `;
+                    animateBalloon();
+                }
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                cancelAnimationFrame(animationId);
+                isPlaying = false;
+                playBtn.classList.remove('play');
+                playBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                `;
+                
+                // Reset values
+                temperature = 300;
+                volume = 1.0;
+                
+                // Update displays and appearance
+                updateTempPointer();
+                updateBalloon();
+                
+                // Remove all heat particles
+                const heatParticles = document.querySelectorAll('.heat-particle');
+                heatParticles.forEach(p => p.remove());
+            });
+            
+            // Info button
+            infoBtn.addEventListener('click', () => {
+                alert("This simulation demonstrates Charles's Law using a hot air balloon:\n\nAs the air inside the balloon is heated, it expands (increasing volume) according to V₁/T₁ = V₂/T₂.\n\nThe expanded air becomes less dense than the surrounding cooler air, creating buoyancy that makes the balloon rise.");
+            });
+            
+            // Initialize temperature pointer
+            updateTempPointer();
+            updateBalloon();
+            
+            // Allow manual temperature control (now goes from cold at bottom to hot at top)
+            tempIndicator.addEventListener('click', (e) => {
+                const rect = tempIndicator.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                const percent = (y / rect.height);
+                temperature = Math.round(300 + (1 - percent) * 150); // Range 300K-450K
+                
+                // Update displays and appearance
+                updateTempPointer();
+                updateBalloon();
+                
+                // Create heat particles
+                createHeatParticles();
+            });
+            
+            // Continuous heat particles when not animating
+            setInterval(() => {
+                if (!isPlaying && temperature > 300) {
+                    createHeatParticles();
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

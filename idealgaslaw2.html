@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Gas Law | IYAMU DESTINY | Houston Community College</title>
+    <meta name="description" content="Learn about the Ideal Gas Law (PV = nRT) and its applications in chemistry.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        /* Balloon animation container */
+        .balloon-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .balloon {
+            position: absolute;
+            bottom: 50px;
+            width: 80px;
+            height: 100px;
+            background-color: #ec4899;
+            border-radius: 50%;
+            transition: all 1s ease-in-out;
+            z-index: 2;
+        }
+        
+        .balloon:before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 15px;
+            background-color: #ec4899;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+        
+        .balloon-string {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            height: 50px;
+            background-color: #94a3b8;
+            transform-origin: top center;
+            z-index: 1;
+        }
+        
+        .flask {
+            position: absolute;
+            bottom: 0;
+            width: 120px;
+            height: 150px;
+            background-color: rgba(203, 213, 225, 0.5);
+            border-radius: 10px 10px 0 0;
+            border: 2px solid #cbd5e1;
+            z-index: 1;
+        }
+        
+        .flask-neck {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 40px;
+            background-color: rgba(203, 213, 225, 0.5);
+            border: 2px solid #cbd5e1;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .heat-source {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 10px;
+            background: linear-gradient(to right, #f59e0b, #ef4444, #f59e0b);
+            border-radius: 5px 5px 0 0;
+            opacity: 0.8;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            padding: 5px 10px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .control-btn:hover {
+            background-color: #4338ca;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas" width="1272" height="594"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-sm shadow-lg py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        <a href="index.html">Gas Laws Explorer</a>
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="pt-16">
+            <!-- Ideal Gas Law Section -->
+            <section id="ideal-gas-law" class="py-16 min-h-screen flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl animate-slideUp">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="p-8 lg:p-12">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                    Ideal Gas Law
+                                </h2>
+                                <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                    <p class="text-lg md:text-xl font-mono text-indigo-900">PV = nRT</p>
+                                </div>
+                                <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                    The Ideal Gas Law describes the relationship between pressure, volume, temperature, and the amount of an ideal gas. It combines all the gas laws into a single equation.
+                                </p>
+                                <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                                        <li class="text-slate-700">The Ideal Gas Law is the most comprehensive gas law that relates pressure (P), volume (V), amount of gas in moles (n), and temperature (T).</li>
+                                        <li class="text-slate-700">R is the universal gas constant (8.314 J/mol·K or 0.0821 L·atm/mol·K).</li>
+                                        <li class="text-slate-700">This law assumes that gas molecules have negligible volume and no attractive forces between them.</li>
+                                        <li class="text-slate-700">It works best for gases at low pressures and high temperatures, where gases behave most ideally.</li>
+                                    </ul>
+                                </div>
+                                <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li class="text-slate-700">Calculating gas properties in chemical reactions</li>
+                                        <li class="text-slate-700">Designing industrial processes involving gases</li>
+                                        <li class="text-slate-700">Understanding atmospheric behavior</li>
+                                        <li class="text-slate-700">Analyzing gas mixtures in various applications</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="p-8 flex items-center">
+                                <div class="w-full h-full animate-slideUp" style="animation-delay: 0.7s;">
+                                    <div class="balloon-container">
+                                        <div class="flask"></div>
+                                        <div class="flask-neck"></div>
+                                        <div class="balloon"></div>
+                                        <div class="balloon-string"></div>
+                                        <div class="heat-source" style="display: none;"></div>
+                                        <div class="controls">
+                                            <button class="control-btn" id="heat-btn">Add Heat</button>
+                                            <button class="control-btn" id="cool-btn">Cool Down</button>
+                                            <button class="control-btn" id="reset-btn">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center text-slate-600">
+                                        <p id="temp-display">Temperature: 25°C</p>
+                                        <p id="volume-display">Balloon Volume: 100%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+        
+        // Resize handler for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Balloon experiment animation
+        const balloon = document.querySelector('.balloon');
+        const heatSource = document.querySelector('.heat-source');
+        const heatBtn = document.getElementById('heat-btn');
+        const coolBtn = document.getElementById('cool-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const tempDisplay = document.getElementById('temp-display');
+        const volumeDisplay = document.getElementById('volume-display');
+        
+        let currentTemp = 25; // °C
+        let currentVolume = 100; // %
+        
+        heatBtn.addEventListener('click', () => {
+            heatSource.style.display = 'block';
+            currentTemp += 25;
+            currentVolume = Math.min(200, currentVolume + 40);
+            
+            updateExperiment();
+        });
+        
+        coolBtn.addEventListener('click', () => {
+            heatSource.style.display = 'none';
+            currentTemp = Math.max(-50, currentTemp - 25);
+            currentVolume = Math.max(60, currentVolume - 40);
+            
+            updateExperiment();
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            heatSource.style.display = 'none';
+            currentTemp = 25;
+            currentVolume = 100;
+            
+            updateExperiment();
+        });
+        
+        function updateExperiment() {
+            // Update balloon size based on volume
+            const newWidth = 80 * (currentVolume / 100);
+            const newHeight = 100 * (currentVolume / 100);
+            
+            balloon.style.width = `${newWidth}px`;
+            balloon.style.height = `${newHeight}px`;
+            
+            // Update displays
+            tempDisplay.textContent = `Temperature: ${currentTemp}°C`;
+            volumeDisplay.textContent = `Balloon Volume: ${currentVolume}%`;
+            
+            // Change balloon color based on temperature
+            if (currentTemp > 25) {
+                balloon.style.backgroundColor = '#ef4444'; // red when hot
+            } else if (currentTemp < 25) {
+                balloon.style.backgroundColor = '#3b82f6'; // blue when cold
+            } else {
+                balloon.style.backgroundColor = '#ec4899'; // pink at normal temp
+            }
+        }
+    </script>
+</body>
+</html>

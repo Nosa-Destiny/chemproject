@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avogadro's Law | Gas Laws Explorer | IYAMU DESTINY | Houston Community College</title>
+    <meta name="description" content="Learn about Avogadro's Law and its applications in chemistry.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            opacity: 0.7;
+        }
+        
+        /* Balloon Animation Styles */
+        .animation-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .balloon {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background-color: rgba(255, 192, 203, 0.7);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            font-weight: bold;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 30px;
+            background-color: rgba(200, 200, 200, 0.8);
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .gas-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #6366f1;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background-color: #4338ca;
+        }
+        
+        .mole-label {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 14px;
+            color: #4f46e5;
+            font-weight: bold;
+        }
+        
+        .balloon-string {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            width: 2px;
+            background-color: #666;
+            transform-origin: top center;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen bg-gradient-to-r from-indigo-50 to-blue-50">
+        <canvas id="canvas" width="1272" height="594"></canvas>
+        
+        <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-transparent py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                        Gas Laws Explorer
+                    </div>
+                    <button id="mobile-menu-button" class="lg:hidden text-slate-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                            <line x1="4" x2="20" y1="12" y2="12"></line>
+                            <line x1="4" x2="20" y1="6" y2="6"></line>
+                            <line x1="4" x2="20" y1="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="hidden lg:block">
+                        <ul class="flex space-x-2 bg-white/80 backdrop-blur-sm shadow-lg p-1.5 rounded-full">
+                            <li><a href="index2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                            <li><a href="boyleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                            <li><a href="charleslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                            <li><a href="gayslussacslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                            <li><a href="avogadroslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 bg-indigo-600 text-white shadow-lg">Avogadro's Law</a></li>
+                            <li><a href="combinedgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                            <li><a href="idealgaslaw2.html" class="px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="lg:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 overflow-hidden">
+                    <ul class="flex flex-col space-y-2 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                        <li><a href="index.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Home</a></li>
+                        <li><a href="boyles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Boyle's Law</a></li>
+                        <li><a href="charles-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Charles's Law</a></li>
+                        <li><a href="gay-lussacs-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Gay-Lussac's Law</a></li>
+                        <li><a href="avogadros-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 bg-indigo-600 text-white">Avogadro's Law</a></li>
+                        <li><a href="combined-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Combined Gas Law</a></li>
+                        <li><a href="ideal-gas-law.html" class="block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-indigo-100 text-slate-700">Ideal Gas Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="pt-16">
+            <!-- Avogadro's Law Section -->
+            <section id="avogadros-law" class="py-16 min-h-screen flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="p-8 lg:p-12">
+                                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 animate-slideUp" style="animation-delay: 0.2s;">
+                                    Avogadro's Law
+                                </h2>
+                                <div class="bg-indigo-50 rounded-xl p-4 mb-6 inline-block animate-slideUp" style="animation-delay: 0.3s;">
+                                    <p class="text-lg md:text-xl font-mono text-indigo-900">V ∝ n (V₁/n₁ = V₂/n₂)</p>
+                                </div>
+                                <p class="text-lg text-slate-700 mb-6 animate-slideUp" style="animation-delay: 0.4s;">
+                                    Avogadro's Law states that the volume of a gas is directly proportional to the number of moles of gas when temperature and pressure are held constant.
+                                </p>
+                                <div class="animate-slideUp" style="animation-delay: 0.5s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Explanation:</h3>
+                                    <ul class="list-disc pl-5 space-y-2 mb-6">
+                                        <li class="text-slate-700">Equal volumes of gases at the same temperature and pressure contain equal numbers of molecules.</li>
+                                        <li class="text-slate-700">As the number of moles of gas increases, the volume increases proportionally.</li>
+                                        <li class="text-slate-700">This relationship is described by the equation V₁/n₁ = V₂/n₂, where V₁ and n₁ represent the initial volume and number of moles, and V₂ and n₂ represent the final volume and number of moles.</li>
+                                    </ul>
+                                </div>
+                                <div class="animate-slideUp" style="animation-delay: 0.6s;">
+                                    <h3 class="text-xl font-semibold mb-3 text-indigo-700">Applications:</h3>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li class="text-slate-700">Chemical reactions involving gases</li>
+                                        <li class="text-slate-700">Gas stoichiometry calculations</li>
+                                        <li class="text-slate-700">Industrial gas processing</li>
+                                        <li class="text-slate-700">Calculating molar volumes of gases</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="p-8 flex items-center">
+                                <div class="w-full animate-slideUp" style="animation-delay: 0.7s;">
+                                    <div class="animation-container" id="avogadro-animation">
+                                        <div class="mole-label" id="mole-label">1 mole of gas</div>
+                                        <div class="balloon" id="balloon">
+                                            <div class="balloon-string"></div>
+                                        </div>
+                                        <div class="controls">
+                                            <button class="control-btn" id="btn-add-moles">Add Moles</button>
+                                            <button class="control-btn" id="btn-remove-moles">Remove Moles</button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center text-slate-600">
+                                        <p>Interactive demonstration showing how balloon volume changes with number of gas moles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="bg-gradient-to-r from-slate-800 to-slate-900 text-white py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap mr-2">
+                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
+                                <path d="M22 10v6"></path>
+                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
+                            </svg>
+                            <p class="font-semibold">IYAMU DESTINY</p>
+                        </div>
+                        <div class="flex items-center justify-center md:justify-start mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school mr-2">
+                                <path d="M14 22v-4a2 2 0 1 0-4 0v4"></path>
+                                <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"></path>
+                                <path d="M18 5v17"></path>
+                                <path d="m4 6 8-4 8 4"></path>
+                                <path d="M6 5v17"></path>
+                                <circle cx="12" cy="9" r="2"></circle>
+                            </svg>
+                            <p class="text-sm text-slate-300">Houston Community College</p>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-400">
+                        <p>© 2025 | Chemistry Gas Laws Explorer</p>
+                        <p class="mt-1">Educational Project</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 1 - 0.5,
+                speedY: Math.random() * 1 - 0.5
+            });
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.5)';
+                ctx.fill();
+                
+                p.x += p.speedX;
+                p.y += p.speedY;
+                
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('max-h-0');
+            
+            if (isOpen) {
+                mobileMenu.classList.remove('max-h-0', 'opacity-0');
+                mobileMenu.classList.add('max-h-screen', 'opacity-100', 'py-4');
+            } else {
+                mobileMenu.classList.add('max-h-0', 'opacity-0');
+                mobileMenu.classList.remove('max-h-screen', 'opacity-100', 'py-4');
+            }
+        });
+        
+        // Animate elements on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-slideUp, .animate-fadeIn');
+            animatedElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1 + 0.2}s`;
+            });
+            
+            // Initialize Avogadro's Law animation
+            initAvogadroAnimation();
+        });
+        
+        // Resize handler for canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Avogadro's Law Animation with Balloon
+        function initAvogadroAnimation() {
+            const container = document.getElementById('avogadro-animation');
+            const balloon = document.getElementById('balloon');
+            const moleLabel = document.getElementById('mole-label');
+            const btnAddMoles = document.getElementById('btn-add-moles');
+            const btnRemoveMoles = document.getElementById('btn-remove-moles');
+            
+            let currentMoles = 1;
+            let gasParticles = [];
+            
+            // Set initial balloon size
+            updateBalloon();
+            
+            // Create initial gas particles
+            createGasParticles(10);
+            
+            // Update balloon size based on current moles
+            function updateBalloon() {
+                const size = 50 + (currentMoles * 30);
+                balloon.style.width = `${size}px`;
+                balloon.style.height = `${size}px`;
+                balloon.textContent = `${currentMoles} mole${currentMoles !== 1 ? 's' : ''}`;
+                moleLabel.textContent = `${currentMoles} mole${currentMoles !== 1 ? 's' : ''} of gas`;
+                
+                // Update particle count
+                const targetParticles = currentMoles * 15;
+                const diff = targetParticles - gasParticles.length;
+                
+                if (diff > 0) {
+                    createGasParticles(diff);
+                } else if (diff < 0) {
+                    removeGasParticles(-diff);
+                }
+            }
+            
+            // Create gas particles
+            function createGasParticles(count) {
+                const balloonRect = balloon.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'gas-particle';
+                    
+                    // Position within the balloon
+                    const left = balloonRect.left - containerRect.left + (Math.random() * balloonRect.width);
+                    const top = balloonRect.top - containerRect.top + (Math.random() * balloonRect.height);
+                    
+                    particle.style.left = `${left}px`;
+                    particle.style.top = `${top}px`;
+                    
+                    container.appendChild(particle);
+                    gasParticles.push({
+                        element: particle,
+                        x: Math.random() * balloonRect.width,
+                        y: Math.random() * balloonRect.height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+            }
+            
+            // Remove gas particles
+            function removeGasParticles(count) {
+                for (let i = 0; i < count && gasParticles.length > 0; i++) {
+                    const particle = gasParticles.pop();
+                    if (particle && particle.element.parentNode) {
+                        particle.element.remove();
+                    }
+                }
+            }
+            
+            // Update particles position
+            function updateParticles() {
+                const balloonRect = balloon.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                gasParticles.forEach(p => {
+                    // Update position
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    // Boundary collision (balloon walls)
+                    if (p.x < 0 || p.x > balloonRect.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > balloonRect.height) p.vy *= -1;
+                    
+                    // Keep within bounds
+                    p.x = Math.max(0, Math.min(balloonRect.width, p.x));
+                    p.y = Math.max(0, Math.min(balloonRect.height, p.y));
+                    
+                    // Update DOM
+                    p.element.style.left = `${balloonRect.left - containerRect.left + p.x}px`;
+                    p.element.style.top = `${balloonRect.top - containerRect.top + p.y}px`;
+                });
+                
+                requestAnimationFrame(updateParticles);
+            }
+            
+            // Start animation
+            updateParticles();
+            
+            // Button handlers
+            btnAddMoles.addEventListener('click', () => {
+                if (currentMoles < 5) {
+                    currentMoles++;
+                    updateBalloon();
+                }
+            });
+            
+            btnRemoveMoles.addEventListener('click', () => {
+                if (currentMoles > 1) {
+                    currentMoles--;
+                    updateBalloon();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
